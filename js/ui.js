@@ -1,0 +1,10 @@
+function modal(h,w){closeMod();const d=document.createElement('div');d.id='mod';d.className='ov';d.innerHTML=`<div class="box${w?' wd':''}">${h}<div class="fl noprint"><button class="g" onclick="closeMod()">Tutup</button></div></div>`;document.body.append(d)}
+function closeMod(){const m=$('#mod');if(m)m.remove()}
+function showQR(c){const i=S.items.find(x=>x.c===c);modal(`<b>RM-WMS MATERIAL LABEL</b><div id="qrb"></div><b>${esc(i.c)}</b><span>${esc(i.n)}</span><button class="noprint" onclick="window.print()">Cetak label</button>`);new QRCode($('#qrb'),{text:i.c,width:170,height:170,correctLevel:QRCode.CorrectLevel.H})}
+function info(i){modal(`<b>${esc(i.c)}</b><span>${esc(i.n)}</span><span class="mu">${esc(i.k)}</span><div style="font-size:28px;font-weight:700">${i.s} ${esc(i.u)}</div>${bd(i)}<span class="mu">Stok minimum: ${i.m}</span>`)}
+let sc=null,lastV='',lastT=0,CB=null;
+function openScan(cb){closeScan();CB=cb;const d=document.createElement('div');d.id='sov';d.className='ov';d.style.zIndex=70;d.innerHTML=`<div class="box"><b>Pindai QR barang</b><div id="rdr"></div><span class="mu" id="sm">Arahkan kamera ke label QR, atau cari barang.</span><div class="fl"><input id="mn" list="dl" placeholder="Cari kode / nama barang"><button onclick="man()">OK</button><button class="g" onclick="closeScan()">Tutup</button></div></div>`;document.body.append(d);$('#mn').onkeydown=e=>{if(e.key==='Enter')man()};
+if(window.Html5Qrcode){sc=new Html5Qrcode('rdr');sc.start({facingMode:'environment'},{fps:10,qrbox:200},t=>hit(t)).catch(()=>{sc=null;const m=$('#sm');if(m)m.textContent='Kamera tidak bisa dibuka (perlu izin kamera). Pakai kolom pencarian.'})}}
+function closeScan(){const s=sc;sc=null;if(s)s.stop().then(()=>s.clear()).catch(()=>{});const d=$('#sov');if(d)d.remove()}
+function man(){const v=$('#mn').value;$('#mn').value='';hit(v,1)}
+function hit(t,f){t=String(t).trim();const n=Date.now();if(!f&&t===lastV&&n-lastT<2000)return;lastV=t;lastT=n;const it=find(t);if(!it)return toast('Barang "'+t+'" tidak ditemukan','e');if(navigator.vibrate)navigator.vibrate(60);CB(it)}
